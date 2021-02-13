@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>JQuery and Vanilla JavaScript To Do List</title>
+    <meta name="author" content="Maksim Svetlakov" />
+    <meta
+      name="description"
+      content="JQuery and Vanilla JavaScript To Do List"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      .column {
+        float: left;
+        width: 50%;
+        padding: 10px;
+      }
+
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      /* toggle grey on checking checkbox */
+      .isChecked {
+        color: grey;
+      }
+
+      ul li.checked {
+        color: grey;
+      }
+      ul li.checked::before {
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>JQuery vs Vanilla JS</h2>
+
+    <div class="row">
+      <!-- jQuery -->
+      <div class="column">
+        <div class="page-header">
+          <h1>jQuery To-Do App</h1>
+        </div>
+
+        <form>
+          <input
+            class="inputNew"
+            id="js"
+            type="text"
+            placeholder="Add an item..."
+          />
+        </form>
+
+        <ul id="jq"></ul>
+
+        <button id="deleteButton">Delete</button>
+      </div>
+      <!-- JS -->
+      <div class="column">
+        <div class="container">
+          <div class="page-header">
+            <h1>JS To-Do App</h1>
+          </div>
+
+          <form id="form">
+            <input
+              class="input_input"
+              id="input"
+              type="text"
+              placeholder="Add an item..."
+            />
+          </form>
+          <div id="list">
+            <ul id="todo_list"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+      integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // JQuery
+      $(document).ready(function () {
+        $("form").on("submit", function (event) {
+          event.preventDefault();
+          // Add item
+          let newVal = $("input").val();
+
+          // conditions for input in JQ input field
+          if (newVal == "" && $("#js").is(":focus")) {
+            alert("Invalid input JQ!");
+            return;
+          }
+          if (newVal == "" && !$("#js").is(":focus")) {
+            return;
+          }
+
+          $("#jq").append(
+            '<li>  <input class="checkboxs" type="checkbox" /> ' +
+              newVal +
+              "</li>"
+          );
+
+          $("input").val("");
+        });
+        // list, checkbox, grey "done task"
+        $('#jq').on("click", "li", function (event) {
+          $(".isChecked").addClass("isChecked");
+          $(this).addClass("isChecked");
+          $(this).find(".checkboxs").attr("checked", "checked");
+        });
+        // delete items
+        $("#deleteButton").on("click", function () {
+          if (confirm("Remove tasks JQ?")) {
+            $(".checkboxs").each(function (i, obj) {
+              if ($(obj).is(":checked")) {
+                $(obj).parent().remove();
+              }
+            });
+          }
+        });
+
+        //dragging items
+
+        $("#jq").sortable({
+          cursor: "move",
+          items: "li",
+          opacity: 0.6,
+          revert: true,
+          update: function (event, ui) {},
+        });
+      });
+
+      // Vanilla JS
+      //Add item
+      const form = document.getElementById("form");
+      const inputJS = document.querySelector(".input_input");
+      const addTodo = (event) => {
+        event.preventDefault();
+        if (!inputJS.value) {
+          alert("Invalid input JS!");
+          return;
+        }
+        const newDiv = document.createElement("li");
+        // for dragging
+        const attr = document.createAttribute("draggable");
+        // end for dragging
+
+        const label = document.createElement("label");
+        const todo_list = document.getElementById("todo_list");
+        const ul = document.querySelector("todo_list");
+        const newContent = document.createTextNode(inputJS.value);
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.setAttribute("id", "check");
+        checkbox.class = 'check';
+        //drag
+        newDiv.className = "draggable";
+        attr.value = "true";
+        newDiv.setAttributeNode(attr);
+        addEventsDragAndDrop(newDiv);
+        //end drag
+        todo_list.appendChild(label);
+        newDiv.appendChild(checkbox);
+        label.appendChild(newContent);
+        newDiv.appendChild(label);
+        todo_list.insertBefore(newDiv, todo_list.childNodes[0]);
+        setTimeout(() => {
+          newDiv.className = "visual";
+        }, 5);
+        inputJS.value = "";
+      };
+      form.addEventListener("submit", addTodo);
+
+      //Grey text on checking checkbox
+
+    //   window.addEventListener("click", (event) => {
+    //     // if the clicked element has a class named check
+    //     if (event.target.classList.contains("check")) {
+    //       // remove or add the class checked only from this element
+    //       event.target.classList.toggle("checked");
+    //     }
+    //   });
+      //   const listTocheck = document.querySelector("ul");
+      //   listTocheck.addEventListener(
+      //     "click",
+      //     function (ev) {
+      //       if (ev.target.tagName === "newDiv") {
+      //         ev.target.classList.toggle("checked");
+      //       }
+      //     },
+      //     false
+      //   );
+      //   function turnListGrey(checkbox) {
+      //     const listContent = document.querySelector(".newDiv");
+      //     listContent.classList.remove("isChecked");
+      //     if (checkbox.checked) {
+      //       listContent.classList.add("isChecked");
+      //     }
+      //   }
+
+      //Delete item
+      const list = document.getElementById("list");
+      const deleteButton = document.createElement("button");
+      deleteButton.innerHTML = '<i class="delete"></i>';
+      deleteButton.classList.add("delete_btn");
+      deleteButton.textContent = "Delete";
+      list.appendChild(deleteButton);
+      deleteButton.addEventListener("click", deleteItem);
+      function deleteItem(event) {
+        if (confirm("Remove tasks JS?")) {
+          let li = todo_list.children;
+          for (let index = 0; index < li.length; index++) {
+            while (li[index] && li[index].children[0].checked) {
+              while (li[index] && li[index].children[0].checked) {
+                todo_list.removeChild(li[index]);
+              }
+            }
+          }
+        } else {
+          return;
+        }
+      }
+      //Dragging items
+
+      const remove = document.querySelector(".draggable");
+
+      function dragStart(e) {
+        this.style.opacity = "0.4";
+        dragSrcEl = this;
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/html", this.innerHTML);
+      }
+
+      function dragEnter(e) {
+        this.classList.add("over");
+      }
+
+      function dragLeave(e) {
+        e.stopPropagation();
+        this.classList.remove("over");
+      }
+
+      function dragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        return false;
+      }
+
+      function dragDrop(e) {
+        if (dragSrcEl != this) {
+          dragSrcEl.innerHTML = this.innerHTML;
+          this.innerHTML = e.dataTransfer.getData("text/html");
+        }
+        return false;
+      }
+
+      function dragEnd(e) {
+        const listItens = document.querySelectorAll(".draggable");
+        [].forEach.call(listItens, function (item) {
+          item.classList.remove("over");
+        });
+        this.style.opacity = "1";
+      }
+
+      function addEventsDragAndDrop(el) {
+        el.addEventListener("dragstart", dragStart, false);
+        el.addEventListener("dragenter", dragEnter, false);
+        el.addEventListener("dragover", dragOver, false);
+        el.addEventListener("dragleave", dragLeave, false);
+        el.addEventListener("drop", dragDrop, false);
+        el.addEventListener("dragend", dragEnd, false);
+      }
+
+      const listItens = document.querySelectorAll(".draggable");
+      [].forEach.call(listItens, function (item) {
+        addEventsDragAndDrop(item);
+      });
+    </script>
+  </body>
+</html>
