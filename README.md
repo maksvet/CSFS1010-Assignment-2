@@ -2,7 +2,9 @@
 JQuery and Vanilla JavaScript To Do list
 
 Vanilla JS column added to page with functionality similar to JQuery. 
-Items could be dragged, deleted. Input is validated for undefined value. 
+Items could be dragged, deleted. Input is validated for undefined value.
+
+
 
 
 ***********
