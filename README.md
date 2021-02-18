@@ -4,6 +4,9 @@ JQuery and Vanilla JavaScript To Do list
 Vanilla JS column added to page with functionality similar to JQuery. 
 Items could be dragged, deleted. Input is validated for undefined value.
 
+Items added by pressing enter. Items turn grey and checkbox is checked on click on item/checkbox. 
+Items are draggable. Items deleted by selecting checkboxes and pressing delete button (prompt). 
+
 
 
 

@@ -26,15 +26,12 @@
         display: table;
         clear: both;
       }
-      /* toggle grey on checking checkbox */
+
       .isChecked {
         color: grey;
       }
 
-      ul li.checked {
-        color: grey;
-      }
-      ul li.checked::before {
+      .notChecked {
         color: black;
       }
     </style>
@@ -49,14 +46,15 @@
           <h1>jQuery To-Do App</h1>
         </div>
 
-        <form>
-          <input
-            class="inputNew"
-            id="js"
-            type="text"
-            placeholder="Add an item..."
-          />
-        </form>
+        <label
+          ><form>
+            <input
+              class="inputNew"
+              id="js"
+              type="text"
+              placeholder="Add an item..."
+            /></form
+        ></label>
 
         <ul id="jq"></ul>
 
@@ -79,6 +77,7 @@
           </form>
           <div id="list">
             <ul id="todo_list"></ul>
+            <button id="deleteButtonJS">Delete</button>
           </div>
         </div>
       </div>
@@ -109,25 +108,24 @@
           if (newVal == "" && !$("#js").is(":focus")) {
             return;
           }
-
+          //add checkbox
           $("#jq").append(
-            '<li>  <input class="checkboxs" type="checkbox" /> ' +
+            '<li>  <input class="checkboxes" type="checkbox" /> ' +
               newVal +
               "</li>"
           );
 
           $("input").val("");
         });
-        // list, checkbox, grey "done task"
-        $('#jq').on("click", "li", function (event) {
-          $(".isChecked").addClass("isChecked");
+        // turn grey toggle
+        $("#jq").on("click", "li", function (event) {
+          $(this).find(".checkboxes").attr("checked", true);
           $(this).addClass("isChecked");
-          $(this).find(".checkboxs").attr("checked", "checked");
         });
         // delete items
         $("#deleteButton").on("click", function () {
           if (confirm("Remove tasks JQ?")) {
-            $(".checkboxs").each(function (i, obj) {
+            $(".checkboxes").each(function (i, obj) {
               if ($(obj).is(":checked")) {
                 $(obj).parent().remove();
               }
@@ -152,7 +150,7 @@
       const inputJS = document.querySelector(".input_input");
       const addTodo = (event) => {
         event.preventDefault();
-        if (!inputJS.value) {
+        if (inputJS.value == "") {
           alert("Invalid input JS!");
           return;
         }
@@ -168,7 +166,7 @@
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.setAttribute("id", "check");
-        checkbox.class = 'check';
+
         //drag
         newDiv.className = "draggable";
         attr.value = "true";
@@ -184,58 +182,23 @@
           newDiv.className = "visual";
         }, 5);
         inputJS.value = "";
+        // grey color
+        checkbox.addEventListener("click", function () {
+          this.parentElement.style.color = "grey";
+          this.checked = !this.checked;
+        });
+        newDiv.addEventListener("click", function () {
+          this.style.color = "grey";
+          checkbox.checked = !checkbox.checked;
+          //grey toggle
+          // else {
+          //     this.parentElement.style.color = 'black'
+          // }
+        });
       };
+
       form.addEventListener("submit", addTodo);
 
-      //Grey text on checking checkbox
-
-    //   window.addEventListener("click", (event) => {
-    //     // if the clicked element has a class named check
-    //     if (event.target.classList.contains("check")) {
-    //       // remove or add the class checked only from this element
-    //       event.target.classList.toggle("checked");
-    //     }
-    //   });
-      //   const listTocheck = document.querySelector("ul");
-      //   listTocheck.addEventListener(
-      //     "click",
-      //     function (ev) {
-      //       if (ev.target.tagName === "newDiv") {
-      //         ev.target.classList.toggle("checked");
-      //       }
-      //     },
-      //     false
-      //   );
-      //   function turnListGrey(checkbox) {
-      //     const listContent = document.querySelector(".newDiv");
-      //     listContent.classList.remove("isChecked");
-      //     if (checkbox.checked) {
-      //       listContent.classList.add("isChecked");
-      //     }
-      //   }
-
-      //Delete item
-      const list = document.getElementById("list");
-      const deleteButton = document.createElement("button");
-      deleteButton.innerHTML = '<i class="delete"></i>';
-      deleteButton.classList.add("delete_btn");
-      deleteButton.textContent = "Delete";
-      list.appendChild(deleteButton);
-      deleteButton.addEventListener("click", deleteItem);
-      function deleteItem(event) {
-        if (confirm("Remove tasks JS?")) {
-          let li = todo_list.children;
-          for (let index = 0; index < li.length; index++) {
-            while (li[index] && li[index].children[0].checked) {
-              while (li[index] && li[index].children[0].checked) {
-                todo_list.removeChild(li[index]);
-              }
-            }
-          }
-        } else {
-          return;
-        }
-      }
       //Dragging items
 
       const remove = document.querySelector(".draggable");
@@ -244,7 +207,7 @@
         this.style.opacity = "0.4";
         dragSrcEl = this;
         e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("text/html", this.innerHTML);
+        e.dataTransfer.setData("application/x-moz-node", this.innerHTML);
       }
 
       function dragEnter(e) {
@@ -265,7 +228,7 @@
       function dragDrop(e) {
         if (dragSrcEl != this) {
           dragSrcEl.innerHTML = this.innerHTML;
-          this.innerHTML = e.dataTransfer.getData("text/html");
+          this.innerHTML = e.dataTransfer.getData("application/x-moz-node");
         }
         return false;
       }
@@ -291,6 +254,29 @@
       [].forEach.call(listItens, function (item) {
         addEventsDragAndDrop(item);
       });
+
+      //Delete item
+      const list = document.getElementById("list");
+      const deleteButton = document.getElementById("deleteButtonJS");
+      deleteButton.innerHTML = '<i class="delete"></i>';
+      deleteButton.classList.add("delete_btn");
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", deleteItem);
+      function deleteItem(event) {
+        if (confirm("Remove tasks JS?")) {
+          let li = todo_list.children;
+
+          for (let index = 0; index < li.length; index++) {
+            while (li[index] && li[index].children[0].checked) {
+              while (li[index] && li[index].children[0].checked) {
+                todo_list.removeChild(li[index]);
+              }
+            }
+          }
+        } else {
+          return;
+        }
+      }
     </script>
   </body>
 </html>
